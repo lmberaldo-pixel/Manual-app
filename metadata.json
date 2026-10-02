@@ -1,0 +1,6 @@
+{
+  "name": "MontaTech - Guia Sequencial de Montagem",
+  "description": "Aplicativo para criação e execução passo a passo de manuais de montagem de equipamentos com fotos sequenciais e instruções detalhadas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
