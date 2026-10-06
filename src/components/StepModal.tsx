@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AssemblyStep, StepImage, CheckpointItem } from '../types';
-import { PRESET_EQUIPMENT_IMAGES, fileToOptimizedDataUrl } from '../utils/storage';
+import { fileToOptimizedDataUrl } from '../utils/storage';
 import {
   Upload,
   Plus,
@@ -11,6 +11,8 @@ import {
   CheckSquare,
   Image as ImageIcon,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface StepModalProps {
@@ -19,6 +21,8 @@ interface StepModalProps {
   onSaveStep: (step: AssemblyStep) => void;
   initialStep?: AssemblyStep | null;
   nextStepNumber: number;
+  allSteps?: AssemblyStep[];
+  onNavigateStep?: (step: AssemblyStep) => void;
 }
 
 export const StepModal: React.FC<StepModalProps> = ({
@@ -27,6 +31,8 @@ export const StepModal: React.FC<StepModalProps> = ({
   onSaveStep,
   initialStep,
   nextStepNumber,
+  allSteps,
+  onNavigateStep,
 }) => {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -62,7 +68,7 @@ export const StepModal: React.FC<StepModalProps> = ({
       // Default new step
       setTitle('');
       setSubtitle('');
-      setMainImage(PRESET_EQUIPMENT_IMAGES[(nextStepNumber - 1) % PRESET_EQUIPMENT_IMAGES.length]?.url || '');
+      setMainImage('');
       setAdditionalImages([]);
       setDescription('');
       setToolsInput('');
@@ -168,6 +174,37 @@ export const StepModal: React.FC<StepModalProps> = ({
 
   const currentStepNumber = initialStep ? initialStep.stepNumber : nextStepNumber;
 
+  const currentIndex = allSteps && initialStep ? allSteps.findIndex((s) => s.id === initialStep.id) : -1;
+  const prevStep = currentIndex > 0 && allSteps ? allSteps[currentIndex - 1] : null;
+  const nextStep = currentIndex >= 0 && currentIndex < (allSteps?.length || 0) - 1 && allSteps ? allSteps[currentIndex + 1] : null;
+
+  const handleGoToStep = (targetStep: AssemblyStep | null) => {
+    if (!targetStep || !onNavigateStep) return;
+    if (title.trim() && mainImage) {
+      const tools = toolsInput
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+      const stepToSave: AssemblyStep = {
+        id: initialStep ? initialStep.id : `step-${Date.now()}`,
+        stepNumber: initialStep ? initialStep.stepNumber : nextStepNumber,
+        title: title.trim(),
+        subtitle: subtitle.trim(),
+        mainImage,
+        additionalImages,
+        description: description.trim(),
+        tools: tools.length > 0 ? tools : undefined,
+        warning: warning.trim() || undefined,
+        tip: tip.trim() || undefined,
+        checkpoints: checkpoints.length > 0 ? checkpoints : undefined,
+        estimatedMinutes: Number(estimatedMinutes) || 15,
+      };
+      onSaveStep(stepToSave);
+    }
+    onNavigateStep(targetStep);
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/85 backdrop-blur-sm overflow-y-auto"
@@ -191,12 +228,40 @@ export const StepModal: React.FC<StepModalProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {initialStep && allSteps && allSteps.length > 1 && (
+              <div className="flex items-center gap-1.5 mr-2">
+                <button
+                  type="button"
+                  onClick={() => handleGoToStep(prevStep)}
+                  disabled={!prevStep}
+                  title={prevStep ? `Ir para Etapa Anterior (#${prevStep.stepNumber})` : 'Primeira etapa'}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors border border-neutral-700"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Etapa Anterior</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleGoToStep(nextStep)}
+                  disabled={!nextStep}
+                  title={nextStep ? `Ir para Próxima Etapa (#${nextStep.stepNumber})` : 'Última etapa'}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors border border-neutral-700"
+                >
+                  <span>Próxima Etapa</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Form Body */}
@@ -280,30 +345,16 @@ export const StepModal: React.FC<StepModalProps> = ({
                 onChange={handleMainImageUpload}
               />
 
-              <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center justify-start mt-2">
                 <button
                   type="button"
                   disabled={isUploadingMain}
                   onClick={() => mainFileInputRef.current?.click()}
-                  className="px-3 py-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-2 text-xs font-semibold text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
                 >
                   <Upload className="w-3.5 h-3.5" />
-                  {isUploadingMain ? 'Enviando...' : 'Carregar Foto do Computador / Celular'}
+                  {isUploadingMain ? 'Enviando foto...' : 'Carregar Foto do Dispositivo'}
                 </button>
-
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-neutral-400">Presets rápidos:</span>
-                  {PRESET_EQUIPMENT_IMAGES.slice(0, 3).map((p, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setMainImage(p.url)}
-                      className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
-                    >
-                      {p.name}
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
 

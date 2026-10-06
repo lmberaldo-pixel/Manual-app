@@ -5,7 +5,7 @@ export const INITIAL_SAMPLE_PROJECT: EquipmentProject = {
   name: 'Montagem de Impressora 3D HyperCore v2',
   subtitle: 'Guia sequencial técnico para montagem mecânica, calibração e cabeamento',
   coverImage: '/src/assets/images/cover_equipment_3dprinter_1790907056807.jpg',
-  category: 'Fabricação Digital & Mecatrônica',
+  category: 'Máquina de Chave',
   difficulty: 'Intermediário',
   estimatedHours: '3h 30min',
   generalDescription: 'Manual completo e sequencial para a montagem de bancada da estrutura, conjunto cinemático CoreXY, tracionamento de correias e cabeamento de precisão da impressora 3D.',

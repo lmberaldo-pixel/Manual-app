@@ -1,12 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { EquipmentProject } from '../types';
-import { PRESET_EQUIPMENT_IMAGES, fileToOptimizedDataUrl } from '../utils/storage';
+import { fileToOptimizedDataUrl } from '../utils/storage';
 import { Upload, Image as ImageIcon, X, Wrench, Sparkles, Check } from 'lucide-react';
 
 interface NewProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateProject: (project: EquipmentProject) => void;
+  onSaveProject?: (project: EquipmentProject) => void;
+  projectToEdit?: EquipmentProject | null;
   isInitialPrompt?: boolean;
 }
 
@@ -14,18 +16,45 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   isOpen,
   onClose,
   onCreateProject,
+  onSaveProject,
+  projectToEdit,
   isInitialPrompt = false,
 }) => {
   const [name, setName] = useState('');
   const [subtitle, setSubtitle] = useState('');
-  const [coverImage, setCoverImage] = useState<string>(PRESET_EQUIPMENT_IMAGES[0].url);
-  const [category, setCategory] = useState('Mecânica & Robótica');
+  const [coverImage, setCoverImage] = useState<string>('');
+  const [category, setCategory] = useState('Máquina de Chave');
   const [difficulty, setDifficulty] = useState<'Iniciante' | 'Intermediário' | 'Avançado' | 'Especialista'>('Intermediário');
-  const [estimatedHours, setEstimatedHours] = useState('2h');
+  const [estimatedHours, setEstimatedHours] = useState('');
   const [generalDescription, setGeneralDescription] = useState('');
-  const [toolsInput, setToolsInput] = useState('Chaves Allen, Alicate de corte, Fita métrica');
+  const [toolsInput, setToolsInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync or reset fields when modal opens or projectToEdit changes
+  useEffect(() => {
+    if (isOpen) {
+      if (projectToEdit) {
+        setName(projectToEdit.name || '');
+        setSubtitle(projectToEdit.subtitle || '');
+        setCoverImage(projectToEdit.coverImage || '');
+        setCategory(projectToEdit.category || 'Máquina de Chave');
+        setDifficulty(projectToEdit.difficulty || 'Intermediário');
+        setEstimatedHours(projectToEdit.estimatedHours || '');
+        setGeneralDescription(projectToEdit.generalDescription || '');
+        setToolsInput((projectToEdit.toolsRequired || []).join(', '));
+      } else {
+        setName('');
+        setSubtitle('');
+        setCoverImage('');
+        setCategory('Máquina de Chave');
+        setDifficulty('Intermediário');
+        setEstimatedHours('');
+        setGeneralDescription('');
+        setToolsInput('');
+      }
+    }
+  }, [isOpen, projectToEdit]);
 
   if (!isOpen) return null;
 
@@ -52,22 +81,37 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
       .map((t) => t.trim())
       .filter(Boolean);
 
-    const newProject: EquipmentProject = {
-      id: `project-${Date.now()}`,
-      name: name.trim(),
-      subtitle: subtitle.trim() || undefined,
-      coverImage: coverImage || PRESET_EQUIPMENT_IMAGES[0].url,
-      category,
-      difficulty,
-      estimatedHours: estimatedHours.trim() || '1h 30min',
-      generalDescription: generalDescription.trim() || 'Guia técnico detalhado para montagem do equipamento.',
-      toolsRequired: tools.length > 0 ? tools : ['Ferramental padrão de bancada'],
-      steps: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    onCreateProject(newProject);
+    if (projectToEdit && onSaveProject) {
+      const updatedProject: EquipmentProject = {
+        ...projectToEdit,
+        name: name.trim(),
+        subtitle: subtitle.trim() || undefined,
+        coverImage: coverImage || projectToEdit.coverImage || '',
+        category,
+        difficulty,
+        estimatedHours: estimatedHours.trim() || '1h',
+        generalDescription: generalDescription.trim() || undefined,
+        toolsRequired: tools,
+        updatedAt: new Date().toISOString(),
+      };
+      onSaveProject(updatedProject);
+    } else {
+      const newProject: EquipmentProject = {
+        id: `project-${Date.now()}`,
+        name: name.trim(),
+        subtitle: subtitle.trim() || undefined,
+        coverImage: coverImage || '',
+        category,
+        difficulty,
+        estimatedHours: estimatedHours.trim() || '1h',
+        generalDescription: generalDescription.trim() || undefined,
+        toolsRequired: tools,
+        steps: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      onCreateProject(newProject);
+    }
     onClose();
   };
 
@@ -83,11 +127,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                {isInitialPrompt ? 'Boas-vindas ao MontaTech' : 'Novo Equipamento'}
+                {projectToEdit ? 'Editar Dados do Projeto' : isInitialPrompt ? 'Boas-vindas ao MontaTech' : 'Novo Equipamento'}
               </span>
             </div>
             <h3 className="text-xl font-bold text-white mt-1">
-              {isInitialPrompt ? 'Iniciar Novo Manual de Montagem' : 'Cadastrar Equipamento'}
+              {projectToEdit ? 'Modificar Cadastro do Equipamento' : isInitialPrompt ? 'Iniciar Novo Manual de Montagem' : 'Cadastrar Equipamento'}
             </h3>
             <p className="text-xs text-neutral-400 mt-1">
               Informe o nome do projeto e selecione a foto de capa principal do equipamento.
@@ -177,56 +221,17 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               onChange={handleFileUpload}
             />
 
-            {/* Presets or Upload button */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={isUploading}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors flex items-center gap-1.5"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  {isUploading ? 'Processando foto...' : 'Fazer Upload do Seu Dispositivo'}
-                </button>
-              </div>
-
-              <span className="text-[11px] text-neutral-400">
-                Ou selecione uma foto de exemplo:
-              </span>
-            </div>
-
-            {/* Presets Grid */}
-            <div className="grid grid-cols-4 gap-2 mt-2">
-              {PRESET_EQUIPMENT_IMAGES.map((preset, idx) => (
-                <button
-                  type="button"
-                  key={idx}
-                  onClick={() => setCoverImage(preset.url)}
-                  className={`relative aspect-video rounded-md overflow-hidden border transition-all text-left group ${
-                    coverImage === preset.url
-                      ? 'border-amber-400 ring-2 ring-amber-400/30'
-                      : 'border-neutral-800 hover:border-neutral-600'
-                  }`}
-                >
-                  <img
-                    src={preset.url}
-                    alt={preset.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-1">
-                    <span className="text-[10px] text-white font-medium truncate">
-                      {preset.name}
-                    </span>
-                  </div>
-                  {coverImage === preset.url && (
-                    <div className="absolute top-1 right-1 p-0.5 rounded-full bg-amber-400 text-neutral-950">
-                      <Check className="w-2.5 h-2.5 stroke-[3]" />
-                    </div>
-                  )}
-                </button>
-              ))}
+            {/* Upload button */}
+            <div className="flex items-center justify-start pt-1">
+              <button
+                type="button"
+                disabled={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+                className="px-3.5 py-2 text-xs font-semibold text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {isUploading ? 'Processando foto...' : 'Fazer Upload do Seu Dispositivo'}
+              </button>
             </div>
           </div>
 
@@ -241,12 +246,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500"
               >
-                <option value="Mecânica & Robótica">Mecânica & Robótica</option>
-                <option value="Impressão 3D & CNC">Impressão 3D & CNC</option>
-                <option value="Eletrônica & IoT">Eletrônica & IoT</option>
-                <option value="Mobiliário & Estruturas">Mobiliário & Estruturas</option>
-                <option value="Manutenção Industrial">Manutenção Industrial</option>
-                <option value="Outro Equipamento">Outro Equipamento</option>
+                <option value="Máquina de Chave">Máquina de Chave</option>
+                <option value="Bonde de Impedância">Bonde de Impedância</option>
+                <option value="Relês">Relês</option>
               </select>
             </div>
 

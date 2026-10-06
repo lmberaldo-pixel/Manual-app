@@ -7,6 +7,7 @@ import {
   setCurrentProjectId,
   exportProjectToJson,
 } from './utils/storage';
+import { INITIAL_SAMPLE_PROJECT } from './sampleData';
 import { Header } from './components/Header';
 import { StepCard } from './components/StepCard';
 import { StepModal } from './components/StepModal';
@@ -25,6 +26,8 @@ import {
   AlertCircle,
   Layers,
   ArrowRight,
+  Trash2,
+  PenTool,
 } from 'lucide-react';
 
 export default function App() {
@@ -34,6 +37,7 @@ export default function App() {
 
   // Modals state
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   const [isStepModalOpen, setIsStepModalOpen] = useState(false);
   const [editingStep, setEditingStep] = useState<AssemblyStep | null>(null);
 
@@ -170,6 +174,37 @@ export default function App() {
     }
   };
 
+  const handleDeleteProject = (projectId: string) => {
+    const projectToDelete = projects.find((p) => p.id === projectId);
+    if (!projectToDelete) return;
+
+    if (!confirm(`Deseja realmente excluir o projeto "${projectToDelete.name}"? Esta ação não pode ser desfeita.`)) {
+      return;
+    }
+
+    const remainingProjects = projects.filter((p) => p.id !== projectId);
+
+    if (remainingProjects.length === 0) {
+      const freshSample: EquipmentProject = {
+        ...INITIAL_SAMPLE_PROJECT,
+        id: `proj_${Date.now()}`,
+        updatedAt: new Date().toISOString(),
+      };
+      setProjects([freshSample]);
+      setCurrentId(freshSample.id);
+    } else {
+      setProjects(remainingProjects);
+      if (currentId === projectId) {
+        setCurrentId(remainingProjects[0].id);
+      }
+    }
+  };
+
+  const handleSaveProjectDetails = (updated: EquipmentProject) => {
+    setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setIsEditProjectModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans">
       {/* Top Bar Contract (3 zones) */}
@@ -179,8 +214,10 @@ export default function App() {
         viewMode={viewMode}
         onSelectViewMode={setViewMode}
         onOpenNewProjectModal={() => setIsNewProjectModalOpen(true)}
+        onOpenEditProjectModal={() => setIsEditProjectModalOpen(true)}
         onSelectProject={(id) => setCurrentId(id)}
         onExportProject={handleExport}
+        onDeleteProject={handleDeleteProject}
       />
 
       {/* Main Content by ViewMode */}
@@ -257,11 +294,29 @@ export default function App() {
                     </button>
 
                     <button
+                      onClick={() => setIsEditProjectModalOpen(true)}
+                      className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-400 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors"
+                      title="Voltar para a página de criação/edição do projeto"
+                    >
+                      <PenTool className="w-3.5 h-3.5" />
+                      <span>Editar Dados do Projeto</span>
+                    </button>
+
+                    <button
                       onClick={() => setViewMode('manual')}
                       className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-neutral-300 hover:text-white bg-neutral-950/80 hover:bg-neutral-900 border border-neutral-800 rounded-lg transition-colors"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       <span>Ver Manual / PDF</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteProject(currentProject.id)}
+                      className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 border border-red-900/50 rounded-lg transition-colors ml-auto"
+                      title="Excluir este projeto"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Excluir Projeto</span>
                     </button>
                   </div>
                 </div>
@@ -375,11 +430,20 @@ export default function App() {
         )}
       </main>
 
-      {/* New Project Modal (Prompts for Project Name & Cover Image) */}
+      {/* New Project Modal (Create New Project) */}
       <NewProjectModal
         isOpen={isNewProjectModalOpen}
         onClose={() => setIsNewProjectModalOpen(false)}
         onCreateProject={handleCreateProject}
+      />
+
+      {/* Edit Project Details Modal (Return to edit project creation data) */}
+      <NewProjectModal
+        isOpen={isEditProjectModalOpen}
+        onClose={() => setIsEditProjectModalOpen(false)}
+        onCreateProject={handleCreateProject}
+        onSaveProject={handleSaveProjectDetails}
+        projectToEdit={currentProject}
       />
 
       {/* Step Modal (Title, Subtitle, Main Photo, Additional Photos, Detailed Description) */}
@@ -392,6 +456,8 @@ export default function App() {
         onSaveStep={handleSaveStep}
         initialStep={editingStep}
         nextStepNumber={currentProject ? currentProject.steps.length + 1 : 1}
+        allSteps={currentProject ? currentProject.steps : []}
+        onNavigateStep={(step) => setEditingStep(step)}
       />
 
       {/* Image Lightbox / Full-screen Inspector */}

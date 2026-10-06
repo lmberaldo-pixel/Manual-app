@@ -18,9 +18,9 @@ export const ManualView: React.FC<ManualViewProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-5xl mx-auto px-6 sm:px-12 py-8 space-y-8 print:max-w-none print:p-0 print:m-0 print:space-y-0 print:bg-white">
       {/* Action Header for Screen (Hidden when printing) */}
-      <div className="no-print flex items-center justify-between p-4 bg-neutral-900 border border-neutral-800 rounded-xl shadow-md">
+      <div className="no-print flex items-center justify-between p-4 bg-neutral-900/90 rounded-xl shadow-md">
         <button
           onClick={onBackToEditor}
           className="flex items-center gap-2 text-xs font-semibold text-neutral-300 hover:text-white transition-colors"
@@ -41,10 +41,20 @@ export const ManualView: React.FC<ManualViewProps> = ({
       </div>
 
       {/* Printable Technical Manual Document */}
-      <article className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 sm:p-10 shadow-2xl text-neutral-100 print:bg-white print:text-black print:border-none print:p-0">
+      <article className="bg-neutral-900/90 rounded-2xl p-8 sm:p-12 text-neutral-100 print:bg-white print:text-black print:p-0 print:m-0 print:rounded-none print:shadow-none">
         {/* Cover Section */}
-        <header className="border-b border-neutral-800 print:border-neutral-300 pb-8 mb-8">
-          <div className="relative aspect-[21/9] w-full rounded-xl overflow-hidden mb-6 border border-neutral-800 print:border-neutral-300">
+        <header className="pb-8 mb-8 print:pb-4 print:mb-0 print-page-break-after">
+          {/* Running Document Header */}
+          <div className="flex items-center justify-between pb-3 mb-6 border-b border-neutral-800/60 print:border-neutral-300 text-xs font-mono">
+            <span className="text-amber-400 print:text-neutral-900 font-bold uppercase tracking-wider">
+              Projeto: {project.name}
+            </span>
+            <span className="text-neutral-400 print:text-neutral-600">
+              Manual Técnico de Montagem
+            </span>
+          </div>
+
+          <div className="relative aspect-[21/9] w-full rounded-xl overflow-hidden mb-6">
             <img
               src={project.coverImage}
               alt={project.name}
@@ -68,7 +78,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
           </div>
 
           {/* Metadata Specs Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-neutral-800/80 print:border-neutral-200 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-neutral-800/60 print:border-neutral-200 text-xs">
             <div>
               <span className="block text-neutral-400 print:text-neutral-600">Categoria</span>
               <span className="font-semibold text-white print:text-black">{project.category}</span>
@@ -89,7 +99,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
 
           {/* Tools Required Section */}
           {project.toolsRequired && project.toolsRequired.length > 0 && (
-            <div className="mt-6 p-4 rounded-xl bg-neutral-950/80 print:bg-neutral-100 border border-neutral-800 print:border-neutral-300">
+            <div className="mt-6 p-4 rounded-xl bg-neutral-950/80 print:bg-neutral-50">
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 print:text-amber-800 mb-2">
                 <Wrench className="w-3.5 h-3.5" />
                 Ferramentas & Equipamentos Necessários
@@ -107,12 +117,22 @@ export const ManualView: React.FC<ManualViewProps> = ({
         </header>
 
         {/* Sequential Steps List */}
-        <section className="space-y-12">
+        <section className="space-y-12 print:space-y-0">
           {project.steps.map((step, idx) => (
             <div
               key={step.id}
-              className="pt-6 border-t border-neutral-800 print:border-neutral-300 first:border-none first:pt-0 print-page-break"
+              className="pt-6 border-t border-neutral-800/60 print:border-none print:pt-2 print:pb-4 print-page-break"
             >
+              {/* Header de Página com Nome do Projeto */}
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-800/60 print:border-neutral-300 text-xs font-mono">
+                <span className="text-amber-400 print:text-neutral-900 font-bold uppercase tracking-wider">
+                  Projeto: {project.name}
+                </span>
+                <span className="text-neutral-400 print:text-neutral-600 font-medium">
+                  Manual Técnico • Passo #{step.stepNumber} de {project.steps.length}
+                </span>
+              </div>
+
               {/* Step Header */}
               <div className="flex items-start gap-3 mb-4">
                 <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-amber-400 text-neutral-950 font-bold text-sm font-mono print:bg-neutral-800 print:text-white">
@@ -134,7 +154,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
                 <div className="md:col-span-2">
                   <div
                     onClick={() => onOpenLightbox(step.mainImage, step.title, step.subtitle)}
-                    className="relative aspect-video rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800 print:border-neutral-300 cursor-pointer group"
+                    className="relative aspect-video rounded-xl overflow-hidden bg-neutral-950 cursor-pointer group"
                   >
                     <img
                       src={step.mainImage}
@@ -161,7 +181,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
                             extra.caption
                           )
                         }
-                        className="relative aspect-video rounded-lg overflow-hidden bg-neutral-950 border border-neutral-800 print:border-neutral-300 cursor-pointer group"
+                        className="relative aspect-video rounded-lg overflow-hidden bg-neutral-950 cursor-pointer group"
                       >
                         <img
                           src={extra.url}
@@ -181,7 +201,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
               </div>
 
               {/* Step Detailed Description */}
-              <div className="p-4 rounded-xl bg-neutral-950/60 print:bg-neutral-50 border border-neutral-800 print:border-neutral-200 text-sm text-neutral-200 print:text-neutral-800 leading-relaxed whitespace-pre-line mb-3">
+              <div className="p-4 rounded-xl bg-neutral-950/60 print:bg-neutral-50 text-sm text-neutral-200 print:text-neutral-800 leading-relaxed whitespace-pre-line mb-3">
                 {step.description}
               </div>
 
@@ -195,7 +215,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
                 )}
 
                 {step.warning && (
-                  <div className="p-2.5 rounded-lg bg-amber-950/20 print:bg-amber-50 border border-amber-900/40 print:border-amber-300 text-amber-200 print:text-amber-900 flex items-start gap-2">
+                  <div className="p-3 rounded-lg bg-amber-950/20 print:bg-amber-50 text-amber-200 print:text-amber-900 flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 text-amber-400 print:text-amber-700 flex-shrink-0 mt-0.5" />
                     <span><strong>Atenção:</strong> {step.warning}</span>
                   </div>

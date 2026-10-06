@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewMode, EquipmentProject } from '../types';
-import { Plus, Play, PenTool, FileText, Download, FolderArchive } from 'lucide-react';
+import { Plus, Play, PenTool, FileText, Download, FolderArchive, Trash2 } from 'lucide-react';
 
 interface HeaderProps {
   currentProject: EquipmentProject;
@@ -8,8 +8,10 @@ interface HeaderProps {
   viewMode: ViewMode;
   onSelectViewMode: (mode: ViewMode) => void;
   onOpenNewProjectModal: () => void;
+  onOpenEditProjectModal: () => void;
   onSelectProject: (projectId: string) => void;
   onExportProject: () => void;
+  onDeleteProject: (projectId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,11 +20,13 @@ export const Header: React.FC<HeaderProps> = ({
   viewMode,
   onSelectViewMode,
   onOpenNewProjectModal,
+  onOpenEditProjectModal,
   onSelectProject,
   onExportProject,
+  onDeleteProject,
 }) => {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3.5 bg-neutral-900/90 backdrop-blur-md border-b border-neutral-800">
+    <header className="no-print sticky top-0 z-30 flex items-center justify-between px-6 py-3.5 bg-neutral-900/90 backdrop-blur-md border-b border-neutral-800">
       {/* Zone 1: Single text element wordmark */}
       <div className="flex items-center gap-4">
         <a
@@ -51,6 +55,14 @@ export const Header: React.FC<HeaderProps> = ({
               </option>
             ))}
           </select>
+
+          <button
+            onClick={() => onDeleteProject(currentProject.id)}
+            title={`Excluir projeto "${currentProject.name}"`}
+            className="p-1.5 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-md transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
@@ -95,6 +107,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Zone 3: Primary Actions */}
       <div className="flex items-center gap-2.5">
+        <button
+          onClick={onOpenEditProjectModal}
+          title="Editar dados e capa deste projeto"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors whitespace-nowrap"
+        >
+          <PenTool className="w-3.5 h-3.5" />
+          <span>Editar Projeto</span>
+        </button>
+
         <button
           onClick={onExportProject}
           title="Baixar backup JSON deste projeto"
