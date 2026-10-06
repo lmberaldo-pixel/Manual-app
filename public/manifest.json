@@ -15,7 +15,8 @@
       "type": "image/png"
     }
   ],
-  "start_url": "./",
+  "start_url": "/Manual-app/",
+  "scope": "/Manual-app/",
   "background_color": "#0a0a0a",
   "theme_color": "#f59e0b",
   "display": "standalone",

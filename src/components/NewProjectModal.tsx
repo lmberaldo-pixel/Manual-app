@@ -90,7 +90,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
         category,
         difficulty,
         estimatedHours: estimatedHours.trim() || '1h',
-        generalDescription: generalDescription.trim() || undefined,
+        generalDescription: generalDescription.trim() || '',
         toolsRequired: tools,
         updatedAt: new Date().toISOString(),
       };
@@ -104,7 +104,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
         category,
         difficulty,
         estimatedHours: estimatedHours.trim() || '1h',
-        generalDescription: generalDescription.trim() || undefined,
+        generalDescription: generalDescription.trim() || '',
         toolsRequired: tools,
         steps: [],
         createdAt: new Date().toISOString(),
