@@ -254,7 +254,7 @@ export const AssemblyMode: React.FC<AssemblyModeProps> = ({
                 src={activePhoto.url}
                 alt={currentStep?.title || 'Foto de montagem'}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover transition-transform duration-300"
+                className="w-full h-full object-contain bg-neutral-950 transition-transform duration-300"
               />
             ) : (
               <div className="flex items-center justify-center h-full text-neutral-600 text-xs">
@@ -311,7 +311,7 @@ export const AssemblyMode: React.FC<AssemblyModeProps> = ({
                       src={photo.url}
                       alt={`Miniatura ${idx + 1}`}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-neutral-950"
                     />
                     <div className="absolute bottom-0 inset-x-0 bg-neutral-950/80 text-[9px] text-white text-center py-0.5 truncate px-1">
                       {photo.isMain ? 'Principal' : `Foto ${idx + 1}`}

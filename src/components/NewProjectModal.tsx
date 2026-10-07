@@ -192,7 +192,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
                   src={coverImage}
                   alt="Imagem de Capa"
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-neutral-950"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-neutral-500">

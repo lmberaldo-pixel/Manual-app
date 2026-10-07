@@ -316,7 +316,7 @@ export const StepModal: React.FC<StepModalProps> = ({
                     src={mainImage}
                     alt={title || 'Foto da Etapa'}
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain bg-neutral-900"
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-neutral-500">
@@ -403,7 +403,7 @@ export const StepModal: React.FC<StepModalProps> = ({
                           src={img.url}
                           alt={`Detalhe ${index + 1}`}
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain bg-neutral-950"
                         />
                       </div>
                       <div className="flex-1 min-w-0">

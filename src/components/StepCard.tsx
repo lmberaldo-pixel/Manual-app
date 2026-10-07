@@ -42,12 +42,12 @@ export const StepCard: React.FC<StepCardProps> = ({
         {/* Step Sequence Indicator & Photos Area */}
         <div className="relative w-full md:w-72 lg:w-80 flex-shrink-0 bg-neutral-950 border-b md:border-b-0 md:border-r border-neutral-800 flex flex-col justify-between">
           {/* Main Photo with Lightbox trigger */}
-          <div className="relative aspect-video md:aspect-[4/3] w-full overflow-hidden group/img">
+          <div className="relative aspect-video md:aspect-[4/3] w-full overflow-hidden group/img bg-neutral-950">
             <img
               src={step.mainImage}
               alt={step.title}
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
+              className="w-full h-full object-contain bg-neutral-950 group-hover/img:scale-105 transition-transform duration-300"
             />
 
             {/* Sequence Number Watermark Badge */}
@@ -87,14 +87,14 @@ export const StepCard: React.FC<StepCardProps> = ({
                       extra.caption
                     )
                   }
-                  className="relative w-12 h-9 rounded overflow-hidden border border-neutral-800 hover:border-amber-400 transition-colors flex-shrink-0 group/extra"
+                  className="relative w-12 h-9 rounded overflow-hidden border border-neutral-800 hover:border-amber-400 transition-colors flex-shrink-0 group/extra bg-neutral-950"
                   title={extra.caption || `Ver foto adicional ${idx + 1}`}
                 >
                   <img
                     src={extra.url}
                     alt={extra.caption || 'Foto extra'}
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain bg-neutral-950"
                   />
                   <div className="absolute inset-0 bg-neutral-950/40 opacity-0 group-hover/extra:opacity-100 transition-opacity flex items-center justify-center">
                     <ZoomIn className="w-3 h-3 text-white" />

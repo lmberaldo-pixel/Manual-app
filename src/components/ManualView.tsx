@@ -160,7 +160,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
                       src={step.mainImage}
                       alt={step.title}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain bg-neutral-950 print:bg-white group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="no-print absolute top-3 left-3 px-2 py-0.5 rounded bg-neutral-950/80 text-[10px] text-white font-mono">
                       Foto Principal
@@ -187,7 +187,7 @@ export const ManualView: React.FC<ManualViewProps> = ({
                           src={extra.url}
                           alt={extra.caption || 'Foto extra'}
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          className="w-full h-full object-contain bg-neutral-950 print:bg-white group-hover:scale-105 transition-transform"
                         />
                         {extra.caption && (
                           <div className="absolute inset-x-0 bottom-0 bg-neutral-950/80 p-1 text-[10px] text-neutral-300 truncate">
