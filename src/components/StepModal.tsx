@@ -207,39 +207,39 @@ export const StepModal: React.FC<StepModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/85 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-neutral-950/85 backdrop-blur-sm overflow-y-auto"
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-3xl bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden my-6">
+      <div className="relative w-full max-w-3xl bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl overflow-hidden my-2 sm:my-6 max-h-[94vh] flex flex-col">
         {/* Header with Sequence Indicator */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-neutral-900/60">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-400 text-neutral-950 font-bold text-sm">
+        <div className="flex flex-wrap items-center justify-between px-4 sm:px-6 py-3.5 border-b border-neutral-800 bg-neutral-900/60 gap-2">
+          <div className="flex items-center gap-2.5">
+            <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-400 text-neutral-950 font-bold text-xs sm:text-sm">
               #{currentStepNumber}
             </span>
             <div>
-              <h3 className="text-base font-bold text-white">
-                {initialStep ? `Editar Etapa #${currentStepNumber}` : `Adicionar Etapa #${currentStepNumber} na Sequência`}
+              <h3 className="text-sm sm:text-base font-bold text-white">
+                {initialStep ? `Editar Etapa #${currentStepNumber}` : `Adicionar Etapa #${currentStepNumber}`}
               </h3>
-              <p className="text-xs text-neutral-400">
-                Defina o título, subtítulo, foto principal, fotos adicionais e a descrição detalhada.
+              <p className="text-[11px] sm:text-xs text-neutral-400">
+                Fotos, títulos e descrição da etapa.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 ml-auto">
             {initialStep && allSteps && allSteps.length > 1 && (
-              <div className="flex items-center gap-1.5 mr-2">
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => handleGoToStep(prevStep)}
                   disabled={!prevStep}
                   title={prevStep ? `Ir para Etapa Anterior (#${prevStep.stepNumber})` : 'Primeira etapa'}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors border border-neutral-700"
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors border border-neutral-700"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
-                  <span>Etapa Anterior</span>
+                  <span className="hidden sm:inline">Anterior</span>
                 </button>
 
                 <button
@@ -247,9 +247,9 @@ export const StepModal: React.FC<StepModalProps> = ({
                   onClick={() => handleGoToStep(nextStep)}
                   disabled={!nextStep}
                   title={nextStep ? `Ir para Próxima Etapa (#${nextStep.stepNumber})` : 'Última etapa'}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors border border-neutral-700"
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-neutral-300 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors border border-neutral-700"
                 >
-                  <span>Próxima Etapa</span>
+                  <span className="hidden sm:inline">Próxima</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -265,7 +265,7 @@ export const StepModal: React.FC<StepModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
           {/* TÍTULO & SUBTÍTULO */}
           <div className="space-y-4 p-4 rounded-lg bg-neutral-950/50 border border-neutral-800">
             <div>
