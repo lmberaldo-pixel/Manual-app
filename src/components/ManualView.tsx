@@ -54,12 +54,12 @@ export const ManualView: React.FC<ManualViewProps> = ({
             </span>
           </div>
 
-          <div className="relative aspect-[21/9] w-full rounded-xl overflow-hidden mb-6 bg-neutral-950">
+          <div className="relative aspect-[21/9] w-full rounded-xl overflow-hidden mb-6">
             <img
               src={project.coverImage}
               alt={project.name}
               referrerPolicy="no-referrer"
-              className="w-full h-full object-contain bg-neutral-950"
+              className="w-full h-full object-contain"
             />
           </div>
 
