@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Project Switcher Select */}
         {projects.length > 0 && currentProject && (
           <div className="flex items-center gap-1 pl-2 sm:pl-3 border-l border-neutral-800 text-xs text-neutral-400">
-            <FolderArchive className="w-3.5 h-3.5 text-neutral-500 hidden xs:block" />
+            <FolderArchive className="w-3.5 h-3.5 text-neutral-500 hidden sm:block" />
             <select
               value={currentProject.id}
               onChange={(e) => onSelectProject(e.target.value)}
@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => onDeleteProject(currentProject.id)}
               title={`Excluir projeto "${currentProject.name}"`}
-              className="p-1 sm:p-1.5 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-md transition-colors"
+              className="hidden sm:block p-1 sm:p-1.5 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-md transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -79,8 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           <PenTool className="w-3.5 h-3.5 text-amber-400" />
-          <span className="hidden sm:inline">Editor</span>
-          <span className="sm:hidden">Editor</span>
+          <span>Editor</span>
         </button>
 
         <button
@@ -110,8 +109,8 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Zone 3: Primary Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-2.5">
+      {/* Zone 3: Primary Actions (Desktop / Tablet) */}
+      <div className="hidden sm:flex items-center gap-1.5 sm:gap-2.5">
         <button
           onClick={onOpenEditProjectModal}
           disabled={!currentProject}
@@ -137,8 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors whitespace-nowrap shadow-sm shadow-amber-950/20"
         >
           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-          <span className="hidden xs:inline">Novo Projeto</span>
-          <span className="xs:hidden">Novo</span>
+          <span>Novo Projeto</span>
         </button>
       </div>
     </header>
