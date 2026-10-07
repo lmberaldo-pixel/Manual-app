@@ -297,17 +297,6 @@ export default function App() {
                       <span>Iniciar Modo Montagem</span>
                     </button>
 
-                    <button
-                      onClick={() => {
-                        setEditingStep(null);
-                        setIsStepModalOpen(true);
-                      }}
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-xl transition-colors min-h-[42px]"
-                    >
-                      <Plus className="w-4 h-4 text-amber-400" />
-                      <span>+ Adicionar Próxima Etapa</span>
-                    </button>
-
                     <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3">
                       <button
                         onClick={() => setIsEditProjectModalOpen(true)}
@@ -360,26 +349,13 @@ export default function App() {
 
             {/* Steps Sequence Section */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
-                <div>
-                  <h3 className="text-lg font-bold text-white tracking-tight">
-                    Sequência de Montagem
-                  </h3>
-                  <p className="text-xs text-neutral-400">
-                    Etapas ordenadas com foto principal, fotos adicionais, título, subtítulo e descrição técnica detalhada.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setEditingStep(null);
-                    setIsStepModalOpen(true);
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-sm"
-                >
-                  <Plus className="w-4 h-4 stroke-[2.5]" />
-                  <span>Adicionar Etapa #{currentProject.steps.length + 1}</span>
-                </button>
+              <div className="pb-2 border-b border-neutral-800">
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  Sequência de Montagem
+                </h3>
+                <p className="text-xs text-neutral-400">
+                  Etapas ordenadas com foto principal, fotos adicionais, título, subtítulo e descrição técnica detalhada.
+                </p>
               </div>
 
               {/* Steps List */}
@@ -427,7 +403,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* Bottom Quick-Add Bar */}
+              {/* Single Bottom Add Step Button */}
               {currentProject.steps.length > 0 && (
                 <div className="pt-4 flex items-center justify-center">
                   <button
@@ -435,9 +411,9 @@ export default function App() {
                       setEditingStep(null);
                       setIsStepModalOpen(true);
                     }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-dashed border-neutral-700 hover:border-amber-400/80 bg-neutral-900/80 hover:bg-neutral-850 text-neutral-300 hover:text-white text-xs font-medium transition-all group"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-dashed border-amber-400/50 hover:border-amber-400 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 hover:text-amber-200 text-xs sm:text-sm font-semibold transition-all shadow-md"
                   >
-                    <Plus className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
                     <span>Adicionar Próxima Etapa à Sequência (Etapa #{currentProject.steps.length + 1})</span>
                   </button>
                 </div>
