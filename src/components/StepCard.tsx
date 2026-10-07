@@ -76,7 +76,7 @@ export const StepCard: React.FC<StepCardProps> = ({
 
           {/* Additional Photos Mini Strip (if any) */}
           {step.additionalImages && step.additionalImages.length > 0 && (
-            <div className="p-2.5 bg-neutral-950/80 border-t border-neutral-800/80 flex items-center gap-2 overflow-x-auto">
+            <div className="p-2.5 bg-neutral-950/80 border-t border-neutral-800/80 flex items-center gap-2 overflow-x-auto no-scrollbar">
               {step.additionalImages.map((extra, idx) => (
                 <button
                   key={extra.id || idx}

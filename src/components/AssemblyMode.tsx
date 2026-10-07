@@ -296,7 +296,7 @@ export const AssemblyMode: React.FC<AssemblyModeProps> = ({
                 <span className="text-[11px] text-neutral-500">Clique para alternar visão</span>
               </div>
 
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                 {allCurrentPhotos.map((photo, idx) => (
                   <button
                     key={idx}

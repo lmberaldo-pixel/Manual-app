@@ -251,22 +251,22 @@ export default function App() {
           />
         ) : (
           /* Editor Mode */
-          <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6 sm:space-y-8">
             {/* Project Hero Banner */}
             <div className="relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 shadow-2xl">
-              <div className="relative aspect-[21/9] sm:aspect-[24/9] w-full">
+              <div className="relative min-h-[380px] sm:min-h-[280px] w-full flex flex-col justify-end">
                 <img
                   src={currentProject.coverImage}
                   alt={currentProject.name}
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
                 {/* Contrast Scrim */}
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-neutral-950/40" />
 
                 {/* Banner Content */}
-                <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end">
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-neutral-400 mb-2">
+                <div className="relative z-10 p-4 sm:p-8 flex flex-col justify-end">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-neutral-400 mb-2">
                     <span className="text-amber-400 font-semibold">{currentProject.category}</span>
                     <span aria-hidden="true">·</span>
                     <span>Dificuldade: {currentProject.difficulty}</span>
@@ -276,24 +276,24 @@ export default function App() {
                     <span className="tabular-nums">{currentProject.steps.length} etapas</span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                  <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
                     {currentProject.name}
                   </h1>
 
                   {currentProject.subtitle && (
-                    <p className="text-sm sm:text-base text-neutral-300 mt-1 max-w-3xl line-clamp-2">
+                    <p className="text-xs sm:text-base text-neutral-300 mt-1 max-w-3xl line-clamp-2">
                       {currentProject.subtitle}
                     </p>
                   )}
 
-                  {/* Actions in Hero */}
-                  <div className="flex flex-wrap items-center gap-3 mt-5">
+                  {/* Mobile-Optimized Actions in Hero */}
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3 mt-4 sm:mt-5">
                     <button
                       onClick={() => setViewMode('assembly')}
                       disabled={currentProject.steps.length === 0}
-                      className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors shadow-lg shadow-amber-950/20"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-neutral-950 bg-amber-400 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-colors shadow-lg shadow-amber-950/20 min-h-[42px]"
                     >
-                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <Play className="w-4 h-4 fill-current" />
                       <span>Iniciar Modo Montagem</span>
                     </button>
 
@@ -302,32 +302,34 @@ export default function App() {
                         setEditingStep(null);
                         setIsStepModalOpen(true);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg transition-colors"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-xl transition-colors min-h-[42px]"
                     >
-                      <Plus className="w-3.5 h-3.5 text-amber-400" />
+                      <Plus className="w-4 h-4 text-amber-400" />
                       <span>+ Adicionar Próxima Etapa</span>
                     </button>
 
-                    <button
-                      onClick={() => setIsEditProjectModalOpen(true)}
-                      className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-400 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors"
-                      title="Voltar para a página de criação/edição do projeto"
-                    >
-                      <PenTool className="w-3.5 h-3.5" />
-                      <span>Editar Dados do Projeto</span>
-                    </button>
+                    <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3">
+                      <button
+                        onClick={() => setIsEditProjectModalOpen(true)}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-amber-400 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-xl transition-colors min-h-[40px]"
+                        title="Editar dados e foto de capa do projeto"
+                      >
+                        <PenTool className="w-3.5 h-3.5" />
+                        <span>Editar Projeto</span>
+                      </button>
 
-                    <button
-                      onClick={() => setViewMode('manual')}
-                      className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-neutral-300 hover:text-white bg-neutral-950/80 hover:bg-neutral-900 border border-neutral-800 rounded-lg transition-colors"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Ver Manual / PDF</span>
-                    </button>
+                      <button
+                        onClick={() => setViewMode('manual')}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-neutral-300 hover:text-white bg-neutral-950/80 hover:bg-neutral-900 border border-neutral-800 rounded-xl transition-colors min-h-[40px]"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Manual / PDF</span>
+                      </button>
+                    </div>
 
                     <button
                       onClick={() => handleDeleteProject(currentProject.id)}
-                      className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 border border-red-900/50 rounded-lg transition-colors ml-auto"
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 border border-red-900/50 rounded-xl transition-colors sm:ml-auto min-h-[40px]"
                       title="Excluir este projeto"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
