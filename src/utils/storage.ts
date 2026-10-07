@@ -103,6 +103,37 @@ export function exportProjectToJson(project: EquipmentProject): void {
 }
 
 /**
+ * Import a project from a JSON backup file selected by the user.
+ * Resolves with the parsed EquipmentProject or rejects on error.
+ */
+export function importProjectFromJson(file: File): Promise<EquipmentProject> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Falha ao ler o arquivo.'));
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result as string);
+        // Basic validation: must have at least id and name
+        if (!parsed || typeof parsed !== 'object' || !parsed.name) {
+          reject(new Error('Arquivo JSON inválido ou não é um projeto MontaTech.'));
+          return;
+        }
+        // Assign a fresh id to avoid collision, preserve original name
+        const project: EquipmentProject = {
+          ...parsed,
+          id: `project-${Date.now()}`,
+          importedAt: new Date().toISOString(),
+        };
+        resolve(project);
+      } catch {
+        reject(new Error('Arquivo não é um JSON válido.'));
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  });
+}
+
+/**
  * Curated preset images for fast testing if user does not upload immediately
  */
 export const PRESET_EQUIPMENT_IMAGES = [

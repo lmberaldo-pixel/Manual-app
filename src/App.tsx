@@ -6,6 +6,7 @@ import {
   getCurrentProjectId,
   setCurrentProjectId,
   exportProjectToJson,
+  importProjectFromJson,
 } from './utils/storage';
 import { Header } from './components/Header';
 import { StepCard } from './components/StepCard';
@@ -174,6 +175,27 @@ export default function App() {
     }
   };
 
+  const handleImport = async (file: File) => {
+    try {
+      const imported = await importProjectFromJson(file);
+      // Check if a project with same name already exists
+      const duplicate = projects.find(
+        (p) => p.name.trim().toLowerCase() === imported.name.trim().toLowerCase()
+      );
+      if (duplicate) {
+        const ok = confirm(
+          `Já existe um projeto com o nome "${imported.name}". Deseja importar mesmo assim como cópia?`
+        );
+        if (!ok) return;
+      }
+      setProjects((prev) => [imported, ...prev]);
+      setCurrentId(imported.id);
+      setViewMode('editor');
+    } catch (err: any) {
+      alert(`Erro ao importar: ${err.message || 'Arquivo inválido.'}`);
+    }
+  };
+
   const handleDeleteProject = (projectId: string) => {
     const projectToDelete = projects.find((p) => p.id === projectId);
     if (!projectToDelete) return;
@@ -211,6 +233,7 @@ export default function App() {
         onOpenEditProjectModal={() => setIsEditProjectModalOpen(true)}
         onSelectProject={(id) => setCurrentId(id)}
         onExportProject={handleExport}
+        onImportProject={handleImport}
         onDeleteProject={handleDeleteProject}
       />
 

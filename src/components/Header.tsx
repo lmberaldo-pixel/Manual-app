@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { ViewMode, EquipmentProject } from '../types';
-import { Plus, Play, PenTool, FileText, Download, FolderArchive, Trash2 } from 'lucide-react';
+import { Plus, Play, PenTool, FileText, Download, Upload, FolderArchive, Trash2 } from 'lucide-react';
 
 interface HeaderProps {
   currentProject: EquipmentProject | null;
@@ -11,6 +11,7 @@ interface HeaderProps {
   onOpenEditProjectModal: () => void;
   onSelectProject: (projectId: string) => void;
   onExportProject: () => void;
+  onImportProject: (file: File) => void;
   onDeleteProject: (projectId: string) => void;
 }
 
@@ -23,8 +24,18 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenEditProjectModal,
   onSelectProject,
   onExportProject,
+  onImportProject,
   onDeleteProject,
 }) => {
+  const importFileRef = useRef<HTMLInputElement>(null);
+
+  const handleImportFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onImportProject(file);
+      e.target.value = ''; // reset so same file can be re-imported
+    }
+  };
   return (
     <header className="no-print sticky top-0 z-30 bg-neutral-900/95 backdrop-blur-md border-b border-neutral-800">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -70,8 +81,26 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Right Actions: Export & + Novo */}
+          {/* Right Actions: Import, Export & + Novo */}
           <div className="flex items-center gap-1.5 flex-shrink-0">
+            {/* Hidden file input for import */}
+            <input
+              ref={importFileRef}
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={handleImportFileChange}
+            />
+
+            <button
+              onClick={() => importFileRef.current?.click()}
+              title="Importar projeto de um arquivo JSON de backup"
+              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-700 hover:text-white transition-colors"
+            >
+              <Upload className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden xs:inline">Importar</span>
+            </button>
+
             <button
               onClick={onExportProject}
               disabled={!currentProject}
