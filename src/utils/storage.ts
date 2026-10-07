@@ -1,5 +1,4 @@
 import { EquipmentProject } from '../types';
-import { INITIAL_SAMPLE_PROJECT } from '../sampleData';
 
 const STORAGE_PROJECTS_KEY = 'montatech_saved_projects_v1';
 const STORAGE_CURRENT_ID_KEY = 'montatech_current_project_id_v1';
@@ -8,17 +7,16 @@ export function loadAllProjects(): EquipmentProject[] {
   try {
     const raw = localStorage.getItem(STORAGE_PROJECTS_KEY);
     if (!raw) {
-      saveAllProjects([INITIAL_SAMPLE_PROJECT]);
-      return [INITIAL_SAMPLE_PROJECT];
+      return [];
     }
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
+    if (Array.isArray(parsed)) {
       return parsed;
     }
-    return [INITIAL_SAMPLE_PROJECT];
+    return [];
   } catch (err) {
     console.error('Error loading projects from storage:', err);
-    return [INITIAL_SAMPLE_PROJECT];
+    return [];
   }
 }
 
@@ -33,10 +31,9 @@ export function saveAllProjects(projects: EquipmentProject[]): void {
 export function getCurrentProjectId(): string {
   try {
     const currentId = localStorage.getItem(STORAGE_CURRENT_ID_KEY);
-    if (currentId) return currentId;
-    return INITIAL_SAMPLE_PROJECT.id;
+    return currentId || '';
   } catch {
-    return INITIAL_SAMPLE_PROJECT.id;
+    return '';
   }
 }
 

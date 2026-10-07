@@ -7,7 +7,6 @@ import {
   setCurrentProjectId,
   exportProjectToJson,
 } from './utils/storage';
-import { INITIAL_SAMPLE_PROJECT } from './sampleData';
 import { Header } from './components/Header';
 import { StepCard } from './components/StepCard';
 import { StepModal } from './components/StepModal';
@@ -28,6 +27,7 @@ import {
   ArrowRight,
   Trash2,
   PenTool,
+  FolderArchive,
 } from 'lucide-react';
 
 export default function App() {
@@ -55,7 +55,7 @@ export default function App() {
 
   // Current active project
   const currentProject = useMemo(() => {
-    return projects.find((p) => p.id === currentId) || projects[0];
+    return projects.find((p) => p.id === currentId) || projects[0] || null;
   }, [projects, currentId]);
 
   // Sync to storage
@@ -183,20 +183,14 @@ export default function App() {
     }
 
     const remainingProjects = projects.filter((p) => p.id !== projectId);
+    setProjects(remainingProjects);
 
     if (remainingProjects.length === 0) {
-      const freshSample: EquipmentProject = {
-        ...INITIAL_SAMPLE_PROJECT,
-        id: `proj_${Date.now()}`,
-        updatedAt: new Date().toISOString(),
-      };
-      setProjects([freshSample]);
-      setCurrentId(freshSample.id);
-    } else {
-      setProjects(remainingProjects);
-      if (currentId === projectId) {
-        setCurrentId(remainingProjects[0].id);
-      }
+      setCurrentId('');
+      localStorage.removeItem('montatech_saved_projects_v1');
+      localStorage.removeItem('montatech_current_project_id_v1');
+    } else if (currentId === projectId) {
+      setCurrentId(remainingProjects[0].id);
     }
   };
 
@@ -222,7 +216,28 @@ export default function App() {
 
       {/* Main Content by ViewMode */}
       <main className="flex-1 pb-16">
-        {viewMode === 'assembly' ? (
+        {!currentProject ? (
+          <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-6">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-amber-400 shadow-xl">
+              <FolderArchive className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Nenhum Projeto Cadastrado
+              </h2>
+              <p className="text-sm text-neutral-400 max-w-md mx-auto leading-relaxed">
+                Você ainda não possui nenhum equipamento ou manual criado. Clique abaixo para iniciar o seu primeiro projeto de montagem.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsNewProjectModalOpen(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-colors shadow-lg shadow-amber-950/30"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Criar Meu Primeiro Projeto</span>
+            </button>
+          </div>
+        ) : viewMode === 'assembly' ? (
           <AssemblyMode
             project={currentProject}
             onExitToEditor={() => setViewMode('editor')}

@@ -3,7 +3,7 @@ import { ViewMode, EquipmentProject } from '../types';
 import { Plus, Play, PenTool, FileText, Download, FolderArchive, Trash2 } from 'lucide-react';
 
 interface HeaderProps {
-  currentProject: EquipmentProject;
+  currentProject: EquipmentProject | null;
   projects: EquipmentProject[];
   viewMode: ViewMode;
   onSelectViewMode: (mode: ViewMode) => void;
@@ -41,29 +41,31 @@ export const Header: React.FC<HeaderProps> = ({
         </a>
 
         {/* Project Switcher Select */}
-        <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-neutral-800 text-xs text-neutral-400">
-          <FolderArchive className="w-3.5 h-3.5 text-neutral-500" />
-          <select
-            value={currentProject.id}
-            onChange={(e) => onSelectProject(e.target.value)}
-            className="bg-neutral-800/80 border border-neutral-700/80 text-neutral-200 text-xs rounded-md px-2 py-1 max-w-[200px] truncate focus:outline-none focus:ring-1 focus:ring-amber-500"
-            title="Alternar Projeto"
-          >
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+        {projects.length > 0 && currentProject && (
+          <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-neutral-800 text-xs text-neutral-400">
+            <FolderArchive className="w-3.5 h-3.5 text-neutral-500" />
+            <select
+              value={currentProject.id}
+              onChange={(e) => onSelectProject(e.target.value)}
+              className="bg-neutral-800/80 border border-neutral-700/80 text-neutral-200 text-xs rounded-md px-2 py-1 max-w-[200px] truncate focus:outline-none focus:ring-1 focus:ring-amber-500"
+              title="Alternar Projeto"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
 
-          <button
-            onClick={() => onDeleteProject(currentProject.id)}
-            title={`Excluir projeto "${currentProject.name}"`}
-            className="p-1.5 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-md transition-colors"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
+            <button
+              onClick={() => onDeleteProject(currentProject.id)}
+              title={`Excluir projeto "${currentProject.name}"`}
+              className="p-1.5 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-md transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Zone 2: Navigation Links / Segmented Mode Selector */}
@@ -109,8 +111,9 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-2.5">
         <button
           onClick={onOpenEditProjectModal}
+          disabled={!currentProject}
           title="Editar dados e capa deste projeto"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-lg transition-colors whitespace-nowrap"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 disabled:opacity-40 disabled:cursor-not-allowed border border-amber-400/30 rounded-lg transition-colors whitespace-nowrap"
         >
           <PenTool className="w-3.5 h-3.5" />
           <span>Editar Projeto</span>
@@ -118,8 +121,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         <button
           onClick={onExportProject}
+          disabled={!currentProject}
           title="Baixar backup JSON deste projeto"
-          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800/80 border border-neutral-700/80 rounded-lg hover:bg-neutral-700/80 hover:text-white transition-colors whitespace-nowrap"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-300 bg-neutral-800/80 disabled:opacity-40 disabled:cursor-not-allowed border border-neutral-700/80 rounded-lg hover:bg-neutral-700/80 hover:text-white transition-colors whitespace-nowrap"
         >
           <Download className="w-3.5 h-3.5" />
           <span>Exportar</span>
