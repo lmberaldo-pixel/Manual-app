@@ -97,20 +97,19 @@ export const Header: React.FC<HeaderProps> = ({
 
         <button
           onClick={() => onSelectViewMode('manual')}
-          className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+          className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
             viewMode === 'manual'
               ? 'bg-neutral-800 text-white shadow-sm ring-1 ring-neutral-700'
               : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
           }`}
         >
           <FileText className="w-3.5 h-3.5 text-neutral-400" />
-          <span className="hidden sm:inline">Manual Técnico</span>
-          <span className="sm:hidden">Manual</span>
+          <span>Manual Técnico</span>
         </button>
       </nav>
 
-      {/* Zone 3: Primary Actions (Desktop / Tablet) */}
-      <div className="hidden sm:flex items-center gap-1.5 sm:gap-2.5">
+      {/* Zone 3: Primary Actions */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5">
         <button
           onClick={onOpenEditProjectModal}
           disabled={!currentProject}
@@ -136,7 +135,8 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold text-neutral-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors whitespace-nowrap shadow-sm shadow-amber-950/20"
         >
           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-          <span>Novo Projeto</span>
+          <span className="hidden xs:inline">Novo Projeto</span>
+          <span className="xs:hidden">Novo</span>
         </button>
       </div>
     </header>
