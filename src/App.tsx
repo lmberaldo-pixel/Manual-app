@@ -3,6 +3,7 @@ import { ViewMode, EquipmentProject, AssemblyStep } from './types';
 import {
   loadAllProjects,
   saveAllProjects,
+  clearAllStorage,
   getCurrentProjectId,
   setCurrentProjectId,
   exportProjectToJson,
@@ -36,11 +37,18 @@ export default function App() {
   const [currentId, setCurrentId] = useState<string>(() => getCurrentProjectId());
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
 
+  // Track whether this is the initial mount to avoid an unnecessary save
+  // that would overwrite storage before the user makes any changes.
+  const isFirstRender = React.useRef(true);
+
   // Modals state
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   const [isStepModalOpen, setIsStepModalOpen] = useState(false);
   const [editingStep, setEditingStep] = useState<AssemblyStep | null>(null);
+
+  // Toast for storage quota warning (non-blocking, mobile-friendly)
+  const [showQuotaWarning, setShowQuotaWarning] = useState(false);
 
   // Lightbox state
   const [lightboxState, setLightboxState] = useState<{
@@ -59,10 +67,37 @@ export default function App() {
     return projects.find((p) => p.id === currentId) || projects[0] || null;
   }, [projects, currentId]);
 
-  // Sync to storage
+  // Mirror of `projects` in a ref so the beforeunload handler can always
+  // access the latest value without a stale closure.
+  const projectsRef = React.useRef(projects);
   useEffect(() => {
-    saveAllProjects(projects);
+    projectsRef.current = projects;
   }, [projects]);
+
+  // Sync to storage — skip the very first render to avoid overwriting existing
+  // data before state is confirmed to be a valid, user-modified version.
+  // This effect is a BACKUP. Critical handlers also save synchronously below.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const result = saveAllProjects(projects);
+    if (!result.ok && result.quotaExceeded) {
+      setShowQuotaWarning(true);
+    }
+  }, [projects]);
+
+  // Safety net: save the very latest state whenever the user closes the tab
+  // or navigates away, catching the window between a state update and the
+  // next render/effect cycle.
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveAllProjects(projectsRef.current);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   useEffect(() => {
     setCurrentProjectId(currentId);
@@ -110,7 +145,14 @@ export default function App() {
       updatedAt: new Date().toISOString(),
     };
 
-    setProjects((prev) => prev.map((p) => (p.id === currentProject.id ? updatedProject : p)));
+    // Compute the next projects array so we can persist it RIGHT NOW,
+    // without waiting for the useEffect to fire after the next render.
+    // This prevents data loss if the user closes the app immediately after saving.
+    const nextProjects = projects.map((p) =>
+      p.id === currentProject.id ? updatedProject : p
+    );
+    setProjects(nextProjects);
+    saveAllProjects(nextProjects);
     setEditingStep(null);
   };
 
@@ -130,7 +172,11 @@ export default function App() {
       updatedAt: new Date().toISOString(),
     };
 
-    setProjects((prev) => prev.map((p) => (p.id === currentProject.id ? updatedProject : p)));
+    const nextProjects = projects.map((p) =>
+      p.id === currentProject.id ? updatedProject : p
+    );
+    setProjects(nextProjects);
+    saveAllProjects(nextProjects);
   };
 
   const handleMoveStep = (index: number, direction: 'up' | 'down') => {
@@ -155,11 +201,17 @@ export default function App() {
       updatedAt: new Date().toISOString(),
     };
 
-    setProjects((prev) => prev.map((p) => (p.id === currentProject.id ? updatedProject : p)));
+    const nextProjects = projects.map((p) =>
+      p.id === currentProject.id ? updatedProject : p
+    );
+    setProjects(nextProjects);
+    saveAllProjects(nextProjects);
   };
 
   const handleCreateProject = (newProj: EquipmentProject) => {
-    setProjects((prev) => [newProj, ...prev]);
+    const nextProjects = [newProj, ...projects];
+    setProjects(nextProjects);
+    saveAllProjects(nextProjects);
     setCurrentId(newProj.id);
     setViewMode('editor');
     // Open step modal automatically for the first step
@@ -188,7 +240,9 @@ export default function App() {
         );
         if (!ok) return;
       }
-      setProjects((prev) => [imported, ...prev]);
+      const nextProjects = [imported, ...projects];
+      setProjects(nextProjects);
+      saveAllProjects(nextProjects);
       setCurrentId(imported.id);
       setViewMode('editor');
     } catch (err: any) {
@@ -208,21 +262,46 @@ export default function App() {
     setProjects(remainingProjects);
 
     if (remainingProjects.length === 0) {
+      // Use the centralized helper so key names never go out of sync
+      clearAllStorage();
       setCurrentId('');
-      localStorage.removeItem('montatech_saved_projects_v1');
-      localStorage.removeItem('montatech_current_project_id_v1');
     } else if (currentId === projectId) {
       setCurrentId(remainingProjects[0].id);
     }
   };
 
   const handleSaveProjectDetails = (updated: EquipmentProject) => {
-    setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    const nextProjects = projects.map((p) => (p.id === updated.id ? updated : p));
+    setProjects(nextProjects);
+    saveAllProjects(nextProjects);
     setIsEditProjectModalOpen(false);
   };
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans">
+      {/* Storage quota warning toast */}
+      {showQuotaWarning && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[200] w-[calc(100%-2rem)] max-w-md"
+          role="alert"
+        >
+          <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-amber-950 border border-amber-700 shadow-2xl text-sm">
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-amber-300 text-xs uppercase tracking-wider mb-0.5">Armazenamento cheio</p>
+              <p className="text-amber-200/90 text-xs leading-relaxed">
+                As fotos são grandes demais para salvar no navegador. Exporte projetos antigos e use fotos menores.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowQuotaWarning(false)}
+              className="text-amber-500 hover:text-amber-300 p-0.5 flex-shrink-0"
+              aria-label="Fechar aviso"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
       {/* Top Bar Contract (3 zones) */}
       <Header
         currentProject={currentProject}
